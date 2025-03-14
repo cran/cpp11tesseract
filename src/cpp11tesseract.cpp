@@ -7,10 +7,6 @@
 #define GenericVector std::vector
 #endif
 
-#include <list>
-#include <string>
-#include <vector>
-
 [[cpp11::register]] int tesseract_major_version() {
   return TESSERACT_MAJOR_VERSION;
 }
@@ -127,8 +123,15 @@ tesseract::TessBaseAPI *get_engine(TessPtr engine) {
   tesseract::TessBaseAPI *api = make_analyze_api();
   writable::logicals out(params.size());
   STRING str;
-  for (int i = 0; i < params.size(); i++)
+  for (int i = 0; i < params.size(); i++) {
+#if TESSERACT_MAJOR_VERSION >= 5
     out[i] = api->GetVariableAsString(std::string(params.at(i)).c_str(), &str);
+#else
+    const char *value =
+        api->GetStringVariable(std::string(params.at(i)).c_str());
+    out[i] = (value != nullptr);
+#endif
+  }
   api->End();
   delete api;
   return out;
@@ -172,11 +175,14 @@ tesseract::TessBaseAPI *get_engine(TessPtr engine) {
   std::vector<std::string> values;
   for (int i = 0; i < params.size(); ++i) {
     STRING str;
-    if (api->GetVariableAsString(std::string(params.at(i)).c_str(), &str)) {
 #if TESSERACT_MAJOR_VERSION >= 5
+    if (api->GetVariableAsString(std::string(params.at(i)).c_str(), &str)) {
       values.push_back(str);
 #else
-      values.push_back(str.string());
+    const char *value =
+        api->GetStringVariable(std::string(params.at(i)).c_str());
+    if (value) {
+      values.push_back(value);
 #endif
     } else {
       values.push_back("");

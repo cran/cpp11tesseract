@@ -1,8 +1,10 @@
 #include <tesseract/baseapi.h> // tesseract
 #include <allheaders.h> // leptonica
 
-#define R_NO_REMAP
-#define STRICT_R_HEADERS
+#include <memory>
+#include <list>
+#include <string>
+#include <vector>
 
 #include <cpp11.hpp>
 

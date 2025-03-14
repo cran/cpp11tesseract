@@ -1,14 +1,20 @@
+# Tesseract configuration
+
 RWINLIB = ../windows/tesseract
 PKG_CPPFLAGS = -I${RWINLIB}/include -I${RWINLIB}/include/leptonica
 
-PKG_LIBS = \
-	-L${RWINLIB}/lib${subst gcc,,${COMPILED_BY}}${R_ARCH} \
+PKG_LIBS = -L${RWINLIB}/lib${subst gcc,,${COMPILED_BY}}${R_ARCH} \
 	-L${RWINLIB}/lib \
 	-ltesseract -lleptonica \
 	-ltiff -lopenjp2 -lwebp -lsharpyuv -ljpeg -lgif -lpng16 -lz \
 	-lws2_32
 
+# Compile
+
 all: clean winlibs
+
+clean:
+	rm -Rf $(OBJECTS) $(SHLIB)
 
 winlibs:
 	mkdir -p ../inst
@@ -16,5 +22,4 @@ winlibs:
 	cp -Rf ../windows/tessdata ../inst/
 	cp -Rf ${RWINLIB}/share/tessdata ../inst/
 
-clean:
-	rm -Rf $(OBJECTS) $(SHLIB)
+.PHONY: all winlibs clean

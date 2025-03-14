@@ -45,7 +45,8 @@ tesseract <- local({
 #' @return no return value, called for side effects
 #' @rdname tesseract
 #' @param filter only list parameters containing a particular string
-#' @examples tesseract_params("debug")
+#' @examples
+#' tesseract_params("smooth")
 tesseract_params <- function(filter = "") {
   tmp <- print_params(tempfile())
   on.exit(unlink(tmp))
@@ -97,32 +98,6 @@ tesseract_engine <- function(datapath, language, configs, options) {
   }
 
   tesseract_engine_internal(datapath, language, configs, opt_names, opt_values)
-}
-
-download_files <- function(urls) {
-  files <- vapply(urls, function(path) {
-    if (grepl("^https?://", path)) {
-      tmp <- tempfile(fileext = basename(path))
-      curl::curl_download(path, tmp)
-      path <- tmp
-    }
-    normalizePath(path, mustWork = TRUE)
-  }, character(1))
-  is_pdf <- grepl(".pdf$", files)
-  out <- unlist(lapply(files[is_pdf], function(path) {
-    pdftools::pdf_convert(path, dpi = 600)
-  }))
-  c(files[!is_pdf], out)
-}
-
-#' @export
-#' @noRd
-"print.tesseract" <- function(x, ...) {
-  info <- engine_info_internal(x)
-  cat("<tesseract engine>\n")
-  cat(" loaded:", info$loaded, "\n")
-  cat(" datapath:", info$datapath, "\n")
-  cat(" available:", info$available, "\n")
 }
 
 bail <- function(...) {
